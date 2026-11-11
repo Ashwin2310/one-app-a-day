@@ -3,8 +3,6 @@ from __future__ import annotations
 
 import html
 
-from .config import MODEL
-
 CATEGORY_LABELS = {
     "problem-solving": "🧠 Problem solving / AI",
     "design": "🎨 Design",
@@ -29,7 +27,9 @@ def app_readme(idea: dict, entry: dict, demo_url: str) -> str:
 
 **[▶ Try the live demo]({demo_url})** · Category: {label} · Day {entry['day']} · {entry['date']}
 
-{shot}## The problem
+{shot}📋 [Read the storyboard](STORYBOARD.md): how the idea was planned, screen by screen.
+
+## The problem
 
 {idea['problem']}
 
@@ -63,8 +63,8 @@ Download this folder and open `index.html` in any browser. That's it.
 
 ---
 
-<sub>Part of a daily build series: one new app every day, generated with an AI pipeline \
-({MODEL}) and published automatically.</sub>
+<sub>Part of a daily build series: one new app every day, planned, storyboarded and built \
+with Claude Code, then published automatically.</sub>
 """
 
 
@@ -89,9 +89,11 @@ and how the app solves it.
 
 ## How this works
 
-Every hour a GitHub Actions workflow rolls a 1-in-24 die. On a hit, Claude brainstorms a new \
-idea in today's category, builds it as HTML/CSS/JS, writes the README, takes a screenshot, \
-commits it under `apps/YYYY-MM-DD/`, and shares it on LinkedIn.
+Once a day a scheduled Claude Code task picks the next category (problem solving, design, \
+utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain \
+HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under \
+`apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in \
+`DAILY_TASK.md`.
 """
 
 
