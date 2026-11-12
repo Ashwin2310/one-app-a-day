@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tablewright · Seating plans solved by simulated annealing</title>
+  <meta name="description" content="Seat wedding and event guests in seconds. Tablewright uses simulated annealing to keep couples together, friend groups close and feuding guests apart, right in your browser.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#plan">Skip to floor plan</a>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="7"/><circle cx="16" cy="4" r="2.6"/><circle cx="26.4" cy="10" r="2.6"/><circle cx="26.4" cy="22" r="2.6"/><circle cx="16" cy="28" r="2.6"/><circle cx="5.6" cy="22" r="2.6"/><circle cx="5.6" cy="10" r="2.6"/></svg>
+      <div>
+        <h1>Tablewright</h1>
+        <p class="brand-sub">Seating plans, solved by simulated annealing</p>
+      </div>
+    </div>
+    <dl class="stats" aria-live="polite">
+      <div class="stat stat-harmony"><dt>Harmony</dt><dd><span id="statHarmony">0</span><small>/100</small></dd></div>
+      <div class="stat"><dt>Rules met</dt><dd id="statRules">0/0</dd></div>
+      <div class="stat"><dt>Hard conflicts</dt><dd id="statHard">0</dd></div>
+      <div class="stat"><dt>Swaps tried</dt><dd id="statSwaps">0</dd></div>
+    </dl>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar" aria-label="Controls">
+      <section class="panel">
+        <div class="tabs" role="tablist" aria-label="Editors">
+          <button class="tab" role="tab" id="tab-guests" aria-controls="pane-guests" aria-selected="true">Guests</button>
+          <button class="tab" role="tab" id="tab-rules" aria-controls="pane-rules" aria-selected="false" tabindex="-1">Rules</button>
+          <button class="tab" role="tab" id="tab-tables" aria-controls="pane-tables" aria-selected="false" tabindex="-1">Tables</button>
+        </div>
+
+        <div class="pane" role="tabpanel" id="pane-guests" aria-labelledby="tab-guests">
+          <label class="field-label" for="guestInput">One guest per line: <code>Name, Group</code></label>
+          <textarea id="guestInput" rows="9" spellcheck="false"></textarea>
+          <div class="row">
+            <span class="hint" id="guestCount">0 guests</span>
+            <button class="btn btn-ghost" id="applyGuests" type="button">Apply list</button>
+          </div>
+        </div>
+
+        <div class="pane" role="tabpanel" id="pane-rules" aria-labelledby="tab-rules" hidden>
+          <form id="ruleForm" class="rule-form">
+            <label class="sr-only" for="ruleA">First guest</label>
+            <select id="ruleA" required></select>
+            <label class="sr-only" for="ruleType">Rule</label>
+            <select id="ruleType">
+              <option value="next">Sit next to</option>
+              <option value="with">Same table</option>
+              <option value="apart">Keep apart</option>
+            </select>
+            <label class="sr-only" for="ruleB">Second guest</label>
+            <select id="ruleB" required></select>
+            <button class="btn btn-ghost" type="submit">Add rule</button>
+          </form>
+          <ul class="rule-list" id="ruleList" aria-label="Rules"></ul>
+        </div>
+
+        <div class="pane" role="tabpanel" id="pane-tables" aria-labelledby="tab-tables" hidden>
+          <form id="tableForm" class="table-form">
+            <label class="field">
+              <span class="field-label">Tables</span>
+              <input id="tableCount" type="number" min="1" max="40" inputmode="numeric" required>
+            </label>
+            <label class="field">
+              <span class="field-label">Seats per table</span>
+              <input id="seatCount" type="number" min="2" max="16" inputmode="numeric" required>
+            </label>
+            <button class="btn btn-ghost" type="submit">Rebuild plan</button>
+          </form>
+          <p class="hint" id="capacityHint"></p>
+        </div>
+      </section>
+
+      <section class="panel solve-panel">
+        <label class="field">
+          <span class="field-label">Thoroughness</span>
+          <select id="thoroughness">
+            <option value="quick">Quick</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="thorough">Thorough (3× swaps)</option>
+          </select>
+        </label>
+        <div class="row">
+          <button class="btn btn-primary" id="solveBtn" type="button">Solve</button>
+          <button class="btn btn-ghost" id="shuffleBtn" type="button">Shuffle</button>
+        </div>
+        <p class="hint">Tip: click a guest, then another seat to swap them by hand.</p>
+      </section>
+
+      <section class="panel guest-card" id="guestCard" aria-live="polite" hidden>
+        <div class="guest-card-head">
+          <span class="dot" id="cardDot"></span>
+          <div>
+            <h2 id="cardName"></h2>
+            <p class="hint" id="cardMeta"></p>
+          </div>
+        </div>
+        <ul class="card-rules" id="cardRules"></ul>
+        <div class="row">
+          <button class="btn btn-ghost" id="pinBtn" type="button">Pin seat</button>
+          <button class="btn btn-ghost" id="deselectBtn" type="button">Done</button>
+        </div>
+      </section>
+
+      <section class="panel export-panel" aria-label="Export">
+        <div class="row wrap">
+          <button class="btn btn-ghost" id="csvBtn" type="button">Download CSV</button>
+          <button class="btn btn-ghost" id="copyBtn" type="button">Copy list</button>
+          <button class="btn btn-ghost" id="printBtn" type="button">Print</button>
+          <button class="btn btn-danger" id="resetBtn" type="button">Reset sample</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="stage" aria-label="Floor plan and results">
+      <div class="plan-wrap panel">
+        <div class="plan-head">
+          <h2>Floor plan</h2>
+          <p class="hint" id="planStatus">Ready</p>
+        </div>
+        <div id="plan" class="plan" tabindex="-1"></div>
+        <p class="empty-msg" id="emptyMsg" hidden>Add guests in the Guests tab to start seating.</p>
+        <ul class="legend" id="legend" aria-label="Groups"></ul>
+      </div>
+
+      <div class="chart-wrap panel">
+        <div class="plan-head">
+          <h2>Search convergence</h2>
+          <p class="summary" id="summary">–</p>
+        </div>
+        <canvas id="chart" height="140" role="img" aria-label="Cost of the seating plan over the course of the search"></canvas>
+      </div>
+
+      <div class="panel">
+        <div class="plan-head"><h2>Table list</h2></div>
+        <div class="table-list" id="tableList"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
