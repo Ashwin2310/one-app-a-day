@@ -2,10 +2,11 @@
 
 A new single-page web app every day: algorithms and in-browser AI, creative design tools, and everyday utilities with extra features. Each one comes with a write-up explaining the problem and how the app solves it.
 
-**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 1 apps so far
+**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 2 apps so far
 
 | Day | Date | App | Category | Links |
 |---:|---|---|---|---|
+| 2 | 2026-11-12 | **Hazeloom**<br><sub>Paint silky mesh gradients by dragging colour points, then export CSS, SVG or PNG.</sub> | 🎨 Design | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-12/) · [Write-up](apps/2026-11-12/README.md) |
 | 1 | 2026-11-11 | **Tablewright**<br><sub>Seat 50 guests in seconds: simulated annealing untangles couples, cliques and feuds</sub> | 🧠 Problem solving / AI | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-11/) · [Write-up](apps/2026-11-11/README.md) |
 
 ## How this works

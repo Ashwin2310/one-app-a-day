@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hazeloom: mesh gradient studio</title>
+  <meta name="description" content="Paint silky mesh gradients by dragging colour points, blended in OKLab, then export CSS, SVG or PNG.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Hazeloom</h1>
+        <p class="sub">mesh gradient studio</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="btn ghost" id="animateBtn" aria-pressed="false">Animate</button>
+      <button type="button" class="btn ghost" id="resetBtn">Reset</button>
+      <button type="button" class="btn primary" id="shuffleBtn">Shuffle</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stage-wrap" aria-label="Gradient canvas">
+      <div class="stage" id="stage">
+        <canvas id="canvas" aria-label="Mesh gradient preview. Double-click to add a colour point."></canvas>
+        <div class="headline" id="headline">
+          <p class="headline-text" id="headlineText">Make it glow.</p>
+          <p class="headline-sub" id="headlineSub">A background worth shipping.</p>
+        </div>
+        <div class="handles" id="handles"></div>
+        <output class="badge" id="contrastBadge" aria-live="polite"></output>
+      </div>
+      <p class="hint">Drag points · double-click to add · arrow keys move the focused point · Delete removes it</p>
+    </section>
+
+    <aside class="panel" aria-label="Controls">
+      <section class="group">
+        <h2>Presets</h2>
+        <div class="chips" id="presets" role="group" aria-label="Presets"></div>
+      </section>
+
+      <section class="group">
+        <h2>Frame</h2>
+        <div class="chips" id="ratios" role="group" aria-label="Aspect ratio"></div>
+      </section>
+
+      <section class="group">
+        <div class="group-head">
+          <h2>Points <span class="count" id="pointCount"></span></h2>
+          <button type="button" class="btn small" id="addBtn">+ Add point</button>
+        </div>
+        <div class="swatches" id="swatches" role="group" aria-label="Colour points"></div>
+        <div class="point-editor" id="pointEditor">
+          <label class="field color-field">
+            <span>Colour</span>
+            <input type="color" id="pointColor">
+            <code id="pointHex"></code>
+          </label>
+          <label class="field">
+            <span>Spread <em id="spreadVal"></em></span>
+            <input type="range" id="pointSpread" min="0.1" max="1" step="0.01">
+          </label>
+          <button type="button" class="btn small danger" id="deleteBtn">Delete point</button>
+        </div>
+      </section>
+
+      <section class="group">
+        <h2>Texture</h2>
+        <label class="field">
+          <span>Softness <em id="softVal"></em></span>
+          <input type="range" id="softness" min="0.6" max="3" step="0.05">
+        </label>
+        <label class="field">
+          <span>Swirl <em id="swirlVal"></em></span>
+          <input type="range" id="swirl" min="0" max="0.25" step="0.005">
+        </label>
+        <label class="field">
+          <span>Grain <em id="grainVal"></em></span>
+          <input type="range" id="grain" min="0" max="0.35" step="0.01">
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="headlineToggle">
+          <span>Headline preview &amp; contrast check</span>
+        </label>
+      </section>
+
+      <section class="group">
+        <h2>Export</h2>
+        <div class="export-row">
+          <button type="button" class="btn primary" id="copyCss">Copy CSS</button>
+          <button type="button" class="btn" id="downloadSvg">SVG</button>
+          <button type="button" class="btn" id="downloadPng">PNG</button>
+          <label class="field inline">
+            <span class="sr-only">PNG width</span>
+            <select id="pngWidth" aria-label="PNG width">
+              <option value="1280">1280 px</option>
+              <option value="1920" selected>1920 px</option>
+              <option value="2560">2560 px</option>
+              <option value="3840">3840 px</option>
+            </select>
+          </label>
+        </div>
+        <pre class="code" tabindex="0" aria-label="Generated CSS"><code id="cssOut"></code></pre>
+      </section>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
