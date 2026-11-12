@@ -7,5 +7,14 @@
     "category": "problem-solving",
     "path": "apps/2026-11-11/",
     "has_screenshot": true
+  },
+  {
+    "day": 2,
+    "date": "2026-11-12",
+    "title": "Hazeloom",
+    "tagline": "Paint silky mesh gradients by dragging colour points, then export CSS, SVG or PNG.",
+    "category": "design",
+    "path": "apps/2026-11-12/",
+    "has_screenshot": true
   }
 ]
