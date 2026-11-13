@@ -1,0 +1,39 @@
+{
+  "title": "Pursepace",
+  "tagline": "A budget that answers one question: how much can I safely spend today?",
+  "problem": "Monthly budgets fail in the middle of the month. A spreadsheet or a banking app tells you what you already spent per category, but not the one thing you need at the checkout: whether today's purchase still leaves enough to reach payday. People who are paid once a month end up either overspending early and scraping through the last week, or being needlessly anxious about money they could actually afford to spend.",
+  "audience": "Anyone paid on a regular cycle who wants to pace their spending money day by day without maintaining a category spreadsheet.",
+  "solution": "Pursepace takes your income, fixed bills and savings target, and turns what is left into a rolling daily allowance that recalculates every day: underspend today and tomorrow's number grows, overspend and the cost is spread across the remaining days. A runway chart projects where you will land on payday at your current pace, and a 'Can I afford it?' check shows exactly what any purchase does to the rest of your cycle before you make it.",
+  "how_it_works": [
+    "Flexible money = income minus fixed bills minus the savings you want to keep this cycle.",
+    "Each day's allowance = (flexible money minus everything spent before that day) divided by the days left until payday, so every day's result rolls forward automatically.",
+    "The runway chart plots remaining money against an even-pace line, then extends your average daily spend to payday to forecast the landing balance or the date the money runs dry.",
+    "The affordability check re-runs the allowance formula with a hypothetical purchase and reports the new daily number and the per-day cost over the remaining days.",
+    "Quick-add text such as '12.50 lunch yesterday' is parsed into amount, note, date and a category guessed from keywords.",
+    "Everything is stored in localStorage as one validated JSON document that can be exported and imported."
+  ],
+  "features": [
+    "Big 'safe to spend today' number with a live meter, updated the moment you log an expense",
+    "Rolling daily allowance: unspent money raises tomorrow's allowance, overspending is spread over the days left",
+    "Runway chart with even-pace line, actual spending and a projection to payday, including a 'runs dry' date warning",
+    "'Can I afford it?' slider that shows what a purchase costs per day for the rest of the cycle, and logs it in one click",
+    "One-line quick add ('8.40 coffee', '35 taxi yesterday') with automatic categorisation",
+    "Day-by-day strip, under-budget streak, and a category breakdown of where the money went",
+    "Plan editor for income, bills, savings, dates and currency, plus JSON export, import, undo and one-click new cycle"
+  ],
+  "tech_highlights": [
+    "Pure, immutable state updates: every action returns a new state object, which makes undo a single reference swap",
+    "A single compute() pass derives allowances, streaks, pace and forecast from raw state, so the UI can never drift out of sync",
+    "Hand-built responsive SVG chart drawn with createElementNS and redrawn to the container width, no chart library",
+    "All user text is rendered with textContent and imported files go through a strict sanitiser before touching state",
+    "Local-date arithmetic done on UTC day numbers to stay correct across daylight-saving changes"
+  ],
+  "try_it": [
+    "Open the app: a sample pay cycle is loaded, and the green card shows what is safe to spend today",
+    "Type '18 lunch' in the quick-add box and press Enter, then watch the number, meter, chart and log update",
+    "Drag the 'Can I afford it?' slider up until the verdict changes from 'fits in today' to 'borrows from later days'",
+    "Tap a day in the day-by-day strip to see that day's allowance and spending",
+    "Open Plan, change a bill or the savings target, and save to see your daily allowance re-pace instantly"
+  ],
+  "linkedin_hook": "Most budgets tell you what you already spent. I built one that tells you what you can still spend today."
+}
