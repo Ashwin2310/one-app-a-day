@@ -16,5 +16,14 @@
     "category": "design",
     "path": "apps/2026-11-12/",
     "has_screenshot": true
+  },
+  {
+    "day": 3,
+    "date": "2026-11-13",
+    "title": "Pursepace",
+    "tagline": "A budget that answers one question: how much can I safely spend today?",
+    "category": "utility",
+    "path": "apps/2026-11-13/",
+    "has_screenshot": true
   }
 ]

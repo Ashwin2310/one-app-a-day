@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pursepace: how much can I safely spend today?</title>
+  <meta name="description" content="Pursepace turns your income, bills and savings goal into a rolling daily allowance, with a runway chart to payday and a 'Can I afford it?' check.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <h1>Pursepace</h1>
+    </div>
+    <p class="cycle-label" id="cycleLabel"></p>
+    <button type="button" class="btn ghost" id="openPlan">Plan</button>
+  </header>
+
+  <div class="banner" id="banner" hidden>
+    <span id="bannerText"></span>
+    <button type="button" class="btn small" id="bannerAction">Start new cycle</button>
+  </div>
+
+  <main>
+    <section class="hero" aria-labelledby="heroTitle">
+      <h2 id="heroTitle" class="eyebrow">Safe to spend today</h2>
+      <p class="amount" id="safeAmount" aria-live="polite"></p>
+      <div class="meter" role="img" id="meter" aria-label="Share of today's allowance spent">
+        <span id="meterFill"></span>
+      </div>
+      <p class="hero-note" id="safeNote"></p>
+      <dl class="stats">
+        <div><dt>Days to payday</dt><dd id="statDays"></dd></div>
+        <div><dt>Under-budget run</dt><dd id="statStreak"></dd></div>
+        <div><dt>Left this cycle</dt><dd id="statLeft"></dd></div>
+      </dl>
+
+      <form class="quick" id="quickForm" novalidate>
+        <div class="field grow">
+          <label for="quickText">Log spending</label>
+          <input id="quickText" type="text" autocomplete="off" maxlength="80" placeholder="12.50 lunch" inputmode="text">
+        </div>
+        <div class="field">
+          <label for="quickCat">Category</label>
+          <select id="quickCat"></select>
+        </div>
+        <div class="field">
+          <label for="quickDate">Date</label>
+          <input id="quickDate" type="date">
+        </div>
+        <button type="submit" class="btn primary">Add</button>
+      </form>
+      <p class="quick-hint" id="quickHint" aria-live="polite"></p>
+    </section>
+
+    <section class="card chart-card" aria-labelledby="chartTitle">
+      <div class="card-head">
+        <h2 id="chartTitle">Runway to payday</h2>
+        <ul class="legend" aria-hidden="true">
+          <li><i class="lg actual"></i>Actual</li>
+          <li><i class="lg pace"></i>Even pace</li>
+          <li><i class="lg proj"></i>Projection</li>
+        </ul>
+      </div>
+      <div class="chart-wrap" id="chartWrap"></div>
+      <p class="forecast" id="forecast"></p>
+      <dl class="pace-stats">
+        <div><dt>Even pace</dt><dd id="paceEven"></dd></div>
+        <div><dt>Your pace</dt><dd id="paceYours"></dd></div>
+        <div><dt>On payday</dt><dd id="paceEnd"></dd></div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="whatTitle">
+      <h2 id="whatTitle">Can I afford it?</h2>
+      <div class="what-inputs">
+        <div class="field">
+          <label for="whatAmount">Price</label>
+          <input id="whatAmount" type="number" min="0" step="1" inputmode="decimal">
+        </div>
+        <div class="field grow">
+          <label for="whatRange">Slide to try a price</label>
+          <input id="whatRange" type="range" min="0" step="1">
+        </div>
+      </div>
+      <p class="verdict" id="whatVerdict" aria-live="polite"></p>
+      <p class="what-detail" id="whatDetail"></p>
+      <button type="button" class="btn" id="whatLog">Log this purchase</button>
+    </section>
+
+    <section class="card" aria-labelledby="catTitle">
+      <h2 id="catTitle">Where it went</h2>
+      <div id="cats"></div>
+    </section>
+
+    <section class="card" aria-labelledby="daysTitle">
+      <h2 id="daysTitle">Day by day</h2>
+      <div class="strip" id="strip"></div>
+      <p class="day-detail" id="dayDetail" aria-live="polite"></p>
+      <ul class="legend strip-legend" aria-hidden="true">
+        <li><i class="sw zero"></i>No spend</li>
+        <li><i class="sw under"></i>Under</li>
+        <li><i class="sw near"></i>A bit over</li>
+        <li><i class="sw over"></i>Well over</li>
+      </ul>
+    </section>
+
+    <section class="card log-card" aria-labelledby="logTitle">
+      <h2 id="logTitle">Spending log</h2>
+      <div id="log"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Everything stays in this browser. No account, no network.</p>
+  </footer>
+
+  <dialog id="planDialog" aria-labelledby="planTitle">
+    <form id="planForm" novalidate>
+      <h2 id="planTitle">Your plan</h2>
+      <div class="plan-grid">
+        <div class="field">
+          <label for="pIncome">Income this cycle</label>
+          <input id="pIncome" type="number" min="0" step="0.01" inputmode="decimal" required>
+        </div>
+        <div class="field">
+          <label for="pSavings">Savings to keep</label>
+          <input id="pSavings" type="number" min="0" step="0.01" inputmode="decimal" required>
+        </div>
+        <div class="field">
+          <label for="pStart">Cycle starts</label>
+          <input id="pStart" type="date" required>
+        </div>
+        <div class="field">
+          <label for="pPayday">Next payday</label>
+          <input id="pPayday" type="date" required>
+        </div>
+        <div class="field">
+          <label for="pCurrency">Currency</label>
+          <select id="pCurrency"></select>
+        </div>
+      </div>
+
+      <h3>Fixed bills</h3>
+      <div id="billRows"></div>
+      <button type="button" class="btn small" id="addBill">Add a bill</button>
+
+      <p class="plan-summary" id="planSummary" aria-live="polite"></p>
+      <p class="plan-error" id="planError" role="alert"></p>
+
+      <div class="plan-actions">
+        <button type="submit" class="btn primary">Save plan</button>
+        <button type="button" class="btn ghost-dark" id="closePlan">Cancel</button>
+      </div>
+
+      <h3>Data</h3>
+      <div class="data-actions">
+        <button type="button" class="btn small" id="newCycle">Start new cycle</button>
+        <button type="button" class="btn small" id="exportData">Export JSON</button>
+        <label class="btn small file-btn" for="importFile">Import JSON</label>
+        <input id="importFile" type="file" accept="application/json,.json" class="visually-hidden">
+        <button type="button" class="btn small" id="loadSample">Load sample</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span id="toastText"></span>
+    <button type="button" class="btn small" id="toastUndo" hidden>Undo</button>
+  </div>
+</body>
+</html>
