@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Kerfwise: plywood cut list optimiser</title>
+  <meta name="description" content="Paste a cut list and Kerfwise packs it onto the fewest plywood sheets, respecting saw kerf and grain, then gives you the exact order to saw them.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <pattern id="hatch" patternUnits="userSpaceOnUse" width="56" height="56" patternTransform="rotate(45)">
+        <line x1="0" y1="0" x2="0" y2="56" stroke="#B9A57A" stroke-width="14"></line>
+      </pattern>
+    </defs>
+  </svg>
+
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+        <rect x="3" y="7" width="34" height="26" rx="3" fill="#EAD7AE" stroke="#1E2A30" stroke-width="2"></rect>
+        <path d="M17 7v26M17 20h20" stroke="#D9481F" stroke-width="2.5" stroke-dasharray="4 3"></path>
+      </svg>
+      <div>
+        <h1>Kerfwise</h1>
+        <p class="tag">Fewest sheets, real saw cuts, for any cut list.</p>
+      </div>
+    </div>
+    <div class="toolbar" role="group" aria-label="Actions">
+      <label class="pick">
+        <span class="sr">Load a sample project</span>
+        <select id="sample">
+          <option value="">Load sample…</option>
+          <option value="kitchen">Kitchen base cabinets</option>
+          <option value="bookshelf">Tall bookshelf</option>
+          <option value="workbench">Workbench with drawers</option>
+        </select>
+      </label>
+      <button type="button" id="optimise" class="btn primary">Optimise again</button>
+      <button type="button" id="csv" class="btn">Export CSV</button>
+      <button type="button" id="copy" class="btn">Copy list</button>
+      <button type="button" id="print" class="btn">Print</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel" aria-label="Job setup">
+      <section class="card">
+        <h2>Stock sheet <span class="unit">mm</span></h2>
+        <div class="stock">
+          <label>Length <input id="s-l" inputmode="decimal" autocomplete="off"></label>
+          <label>Width <input id="s-w" inputmode="decimal" autocomplete="off"></label>
+          <label>Saw kerf <input id="s-kerf" inputmode="decimal" autocomplete="off"></label>
+          <label>Edge trim <input id="s-trim" inputmode="decimal" autocomplete="off"></label>
+          <label>Price / sheet <input id="s-price" inputmode="decimal" autocomplete="off"></label>
+        </div>
+        <p class="hint">Kerf is the blade thickness lost on every cut. Edge trim is shaved off all four edges first.</p>
+      </section>
+
+      <section class="card">
+        <h2>Parts <span class="unit" id="piece-count"></span></h2>
+        <div class="phead" aria-hidden="true">
+          <span>Label</span><span>Length</span><span>Width</span><span>Qty</span><span title="Allow rotation">Rot</span><span></span>
+        </div>
+        <div id="parts" class="parts"></div>
+        <div class="row-actions">
+          <button type="button" id="add" class="btn">+ Add part</button>
+          <button type="button" id="reset" class="btn ghost">Reset to sample</button>
+        </div>
+        <p class="hint">Untick <b>Rot</b> to lock a part's grain: its length then always runs along the sheet length.</p>
+        <details class="bulk">
+          <summary>Bulk paste</summary>
+          <label for="bulk-text">One part per line: Label, length, width, qty</label>
+          <textarea id="bulk-text" rows="4" spellcheck="false" placeholder="Shelf, 800, 300, 4&#10;Divider, 350, 300, 2"></textarea>
+          <button type="button" id="bulk-add" class="btn">Add parts</button>
+        </details>
+      </section>
+    </aside>
+
+    <section class="results" aria-label="Cutting plan">
+      <div id="stats" class="stats"></div>
+      <div class="status">
+        <p id="status" role="status" aria-live="polite"></p>
+        <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+      </div>
+      <div id="notices" class="notices"></div>
+      <div id="sheets" class="sheets"></div>
+      <section class="card steps" id="steps-card">
+        <div class="steps-head">
+          <h2 id="steps-title">Cut sequence</h2>
+          <div class="stepper">
+            <button type="button" id="prev" class="btn">Previous</button>
+            <span id="step-pos" class="mono"></span>
+            <button type="button" id="next" class="btn primary">Next cut</button>
+          </div>
+        </div>
+        <p class="hint">Every cut runs edge to edge across the piece in your hands, so a table saw, panel saw or track saw can make it. Sizes are length × width.</p>
+        <ol id="steps" class="steplist"></ol>
+      </section>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Runs entirely in your browser. Your cut list is saved on this device only.</p>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
