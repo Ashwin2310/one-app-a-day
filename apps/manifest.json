@@ -25,5 +25,14 @@
     "category": "utility",
     "path": "apps/2026-11-13/",
     "has_screenshot": true
+  },
+  {
+    "day": 4,
+    "date": "2026-11-15",
+    "title": "Kerfwise",
+    "tagline": "Paste a cut list, get the fewest plywood sheets and the exact order to saw them.",
+    "category": "problem-solving",
+    "path": "apps/2026-11-15/",
+    "has_screenshot": true
   }
 ]
