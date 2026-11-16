@@ -1,0 +1,492 @@
+'use strict';
+
+const BASE = 1000;
+const REACH = 900;
+const WAVE_LENGTH = 180;
+const WAVE_STEP = 20;
+const MAX_HISTORY = 30;
+const MIN_SPACING = 6;
+const MIN_SPACING_DOTS = 9;
+const SVG_EXPORT_SIZE = 2000;
+const PNG_EXPORT_SIZE = 2000;
+const MAX_CANVAS_PX = 1600;
+const BLENDS = ['screen', 'difference', 'multiply', 'exclusion'];
+const TYPES = [['lines', 'Lines'], ['circles', 'Rings'], ['radial', 'Spokes'], ['grid', 'Grid'], ['dots', 'Dots']];
+const TAU = Math.PI * 2;
+
+const FIELDS = [
+  { key: 'spacing', label: 'Spacing', min: 6, max: 60, step: 0.5, unit: ' px' },
+  { key: 'angle', label: 'Angle', min: -90, max: 90, step: 0.1, unit: '°' },
+  { key: 'thick', label: 'Thickness', min: 0.05, max: 0.95, step: 0.01, unit: '' },
+  { key: 'wave', label: 'Wave', min: 0, max: 40, step: 1, unit: ' px' },
+  { key: 'ox', label: 'Offset X', min: -200, max: 200, step: 1, unit: '' },
+  { key: 'oy', label: 'Offset Y', min: -200, max: 200, step: 1, unit: '' },
+  { key: 'drift', label: 'Drift', min: -10, max: 10, step: 0.1, unit: '°/s' },
+];
+
+const L = (type, color, spacing, thick, extra = {}) => ({
+  on: true, type, color, spacing, angle: 0, thick, wave: 0, ox: 0, oy: 0, drift: 0, ...extra,
+});
+const OFF = (color) => L('lines', color, 20, 0.3, { on: false });
+
+const PRESETS = [
+  { name: 'Halo', bg: '#0a0c14', blend: 'screen', layers: [
+    L('circles', '#ff5d8f', 16, 0.4, { ox: -90 }),
+    L('circles', '#5de1ff', 16, 0.4, { ox: 90, drift: 6 }),
+    L('radial', '#ffd36b', 30, 0.1, { drift: -2 })] },
+  { name: 'Fabric', bg: '#07100f', blend: 'screen', layers: [
+    L('lines', '#7cf3d0', 10, 0.45),
+    L('lines', '#ff5d8f', 10, 0.45, { angle: 4, drift: 0.5 }),
+    OFF('#ffd36b')] },
+  { name: 'Weave', bg: '#0b0a16', blend: 'screen', layers: [
+    L('grid', '#5de1ff', 18, 0.3),
+    L('grid', '#ff5d8f', 18, 0.3, { angle: 7, drift: 0.8 }),
+    OFF('#ffd36b')] },
+  { name: 'Ripple', bg: '#120d08', blend: 'difference', layers: [
+    L('lines', '#ffd36b', 12, 0.4, { wave: 18 }),
+    L('lines', '#b78bff', 12, 0.4, { wave: 18, angle: 3, drift: 0.4 }),
+    OFF('#5de1ff')] },
+  { name: 'Dotty', bg: '#0a0c14', blend: 'screen', layers: [
+    L('dots', '#ff5d8f', 14, 0.5),
+    L('dots', '#5de1ff', 14, 0.5, { angle: 6, drift: 0.7 }),
+    OFF('#ffd36b')] },
+  { name: 'Vortex', bg: '#080a12', blend: 'screen', layers: [
+    L('radial', '#ffd36b', 20, 0.4, { ox: -50 }),
+    L('radial', '#5de1ff', 20, 0.4, { ox: 50, drift: 3 }),
+    L('circles', '#ff5d8f', 30, 0.1)] },
+];
+
+const $ = (id) => document.getElementById(id);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const r1 = (n) => Math.round(n * 10) / 10;
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let state = { ...clone(PRESETS[0]), playing: !reducedMotion };
+let activeLayer = 0;
+let activePreset = 0;
+let undoStack = [];
+let clock = 0;
+let lastFrame = 0;
+let toastTimer = 0;
+
+/* ---------- geometry: one path string per layer, shared by canvas and SVG ---------- */
+
+function circlePath(x, y, r) {
+  return `M${r1(x - r)} ${r1(y)}a${r1(r)} ${r1(r)} 0 1 0 ${r1(2 * r)} 0a${r1(r)} ${r1(r)} 0 1 0 ${r1(-2 * r)} 0`;
+}
+
+function wavyRow(y, wave) {
+  if (!wave) return `M${-REACH} ${r1(y)}L${REACH} ${r1(y)}`;
+  let d = '';
+  for (let x = -REACH; x <= REACH; x += WAVE_STEP) {
+    const yy = y + wave * Math.sin((x / WAVE_LENGTH) * TAU);
+    d += `${d ? 'L' : 'M'}${x} ${r1(yy)}`;
+  }
+  return d;
+}
+
+function effectiveSpacing(layer) {
+  return Math.max(layer.type === 'dots' ? MIN_SPACING_DOTS : MIN_SPACING, layer.spacing);
+}
+
+function layerPath(layer) {
+  const s = effectiveSpacing(layer);
+  const n = Math.ceil(REACH / s);
+  let d = '';
+  if (layer.type === 'lines' || layer.type === 'grid') {
+    for (let k = -n; k <= n; k++) d += wavyRow(k * s, layer.wave);
+  }
+  if (layer.type === 'grid') {
+    for (let k = -n; k <= n; k++) d += `M${r1(k * s)} ${-REACH}L${r1(k * s)} ${REACH}`;
+  }
+  if (layer.type === 'circles') {
+    for (let k = 1; k <= n; k++) d += circlePath(0, 0, k * s);
+  }
+  if (layer.type === 'radial') {
+    const count = Math.max(8, Math.round(1800 / s));
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * TAU;
+      d += `M0 0L${r1(Math.cos(a) * REACH)} ${r1(Math.sin(a) * REACH)}`;
+    }
+  }
+  if (layer.type === 'dots') {
+    const r = (s * layer.thick) / 2;
+    const reach = BASE * 0.72 + r;
+    for (let i = -n; i <= n; i++) {
+      for (let j = -n; j <= n; j++) {
+        const x = i * s;
+        const y = j * s;
+        if (Math.hypot(x + layer.ox, y + layer.oy) <= reach) d += circlePath(x, y, r);
+      }
+    }
+  }
+  return d;
+}
+
+function strokeWidth(layer) {
+  return layer.type === 'radial' ? 1 + layer.thick * 5 : effectiveSpacing(layer) * layer.thick;
+}
+
+function layerAngle(layer, t) {
+  return layer.angle + layer.drift * t;
+}
+
+/* ---------- rendering ---------- */
+
+function paint(c, size, t) {
+  c.save();
+  c.fillStyle = state.bg;
+  c.fillRect(0, 0, size, size);
+  c.scale(size / BASE, size / BASE);
+  c.beginPath();
+  c.rect(0, 0, BASE, BASE);
+  c.clip();
+  c.translate(BASE / 2, BASE / 2);
+  state.layers.filter((l) => l.on).forEach((layer) => {
+    c.save();
+    c.globalCompositeOperation = state.blend;
+    c.rotate((layerAngle(layer, t) * Math.PI) / 180);
+    c.translate(layer.ox, layer.oy);
+    const path = new Path2D(layerPath(layer));
+    if (layer.type === 'dots') {
+      c.fillStyle = layer.color;
+      c.fill(path);
+    } else {
+      c.strokeStyle = layer.color;
+      c.lineWidth = strokeWidth(layer);
+      c.stroke(path);
+    }
+    c.restore();
+  });
+  c.restore();
+}
+
+function render() {
+  paint(ctx, canvas.width, clock);
+  $('empty').hidden = state.layers.some((l) => l.on);
+}
+
+function fitCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const px = clamp(Math.round(canvas.clientWidth * dpr), 200, MAX_CANVAS_PX);
+  if (canvas.width !== px) {
+    canvas.width = px;
+    canvas.height = px;
+  }
+  render();
+}
+
+function frame(now) {
+  if (state.playing) {
+    clock += Math.min(0.1, (now - lastFrame) / 1000);
+    render();
+  }
+  lastFrame = now;
+  requestAnimationFrame(frame);
+}
+
+/* ---------- export ---------- */
+
+function buildSvg() {
+  const groups = state.layers.filter((l) => l.on).map((layer) => {
+    const a = r1(layerAngle(layer, clock));
+    const paint = layer.type === 'dots'
+      ? `fill="${layer.color}"`
+      : `fill="none" stroke="${layer.color}" stroke-width="${r1(strokeWidth(layer))}"`;
+    return `<g style="mix-blend-mode:${state.blend}" transform="rotate(${a}) translate(${layer.ox} ${layer.oy})">`
+      + `<path ${paint} d="${layerPath(layer)}"/></g>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_EXPORT_SIZE}" height="${SVG_EXPORT_SIZE}" viewBox="0 0 ${BASE} ${BASE}">`
+    + `<defs><clipPath id="f"><rect width="${BASE}" height="${BASE}"/></clipPath></defs>`
+    + `<rect width="${BASE}" height="${BASE}" fill="${state.bg}"/>`
+    + `<g clip-path="url(#f)"><g transform="translate(${BASE / 2} ${BASE / 2})">${groups.join('')}</g></g></svg>`;
+}
+
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportSvg() {
+  download(new Blob([buildSvg()], { type: 'image/svg+xml' }), 'beatfield.svg');
+  toast('SVG saved');
+}
+
+function exportPng() {
+  const off = document.createElement('canvas');
+  off.width = PNG_EXPORT_SIZE;
+  off.height = PNG_EXPORT_SIZE;
+  paint(off.getContext('2d'), PNG_EXPORT_SIZE, clock);
+  off.toBlob((blob) => {
+    if (!blob) { toast('Could not create the PNG'); return; }
+    download(blob, 'beatfield.png');
+    toast('PNG saved');
+  }, 'image/png');
+}
+
+/* ---------- share link ---------- */
+
+function encodeState() {
+  const { bg, blend, layers } = state;
+  return btoa(JSON.stringify({ bg, blend, layers }));
+}
+
+function validColor(v, fallback) {
+  return typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v) ? v : fallback;
+}
+
+function sanitize(raw) {
+  if (!raw || !Array.isArray(raw.layers) || raw.layers.length !== 3) throw new Error('shape');
+  const layers = raw.layers.map((l, i) => {
+    const base = PRESETS[0].layers[i];
+    const out = { on: l.on === true, type: TYPES.some(([t]) => t === l.type) ? l.type : base.type,
+      color: validColor(l.color, base.color) };
+    FIELDS.forEach((f) => {
+      const n = Number(l[f.key]);
+      out[f.key] = Number.isFinite(n) ? clamp(n, f.min, f.max) : base[f.key];
+    });
+    return out;
+  });
+  return {
+    bg: validColor(raw.bg, '#0a0c14'),
+    blend: BLENDS.includes(raw.blend) ? raw.blend : 'screen',
+    layers,
+  };
+}
+
+function loadFromHash() {
+  const h = location.hash.slice(1);
+  if (!h) return false;
+  try {
+    state = { ...sanitize(JSON.parse(atob(h))), playing: !reducedMotion };
+    activePreset = -1;
+    return true;
+  } catch (err) {
+    console.warn('Ignoring invalid design link', err.message);
+    return false;
+  }
+}
+
+async function copyLink() {
+  const url = `${location.origin}${location.pathname}#${encodeState()}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Link copied');
+  } catch (err) {
+    history.replaceState(null, '', `#${encodeState()}`);
+    toast('Link is in the address bar, copy it from there');
+  }
+}
+
+/* ---------- state changes ---------- */
+
+function remember() {
+  undoStack = [...undoStack.slice(-(MAX_HISTORY - 1)), clone({ bg: state.bg, blend: state.blend, layers: state.layers })];
+  $('undo').disabled = false;
+}
+
+function setDesign(design, presetIndex) {
+  remember();
+  state = { ...clone(design), playing: state.playing };
+  activePreset = presetIndex;
+  clock = 0;
+  syncUi();
+  render();
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  const prev = undoStack[undoStack.length - 1];
+  undoStack = undoStack.slice(0, -1);
+  state = { ...clone(prev), playing: state.playing };
+  activePreset = -1;
+  $('undo').disabled = undoStack.length === 0;
+  syncUi();
+  render();
+}
+
+function randomise() {
+  const rnd = (lo, hi) => lo + Math.random() * (hi - lo);
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const hue = rnd(0, 360);
+  const color = (i) => `hsl(${(hue + i * 110) % 360} 90% 62%)`;
+  const toHex = (css) => {
+    const c = document.createElement('canvas').getContext('2d');
+    c.fillStyle = css;
+    return c.fillStyle;
+  };
+  const type = pick(TYPES)[0];
+  const spacing = rnd(8, 30);
+  const layers = [0, 1, 2].map((i) => L(i === 0 || Math.random() > 0.3 ? type : pick(TYPES)[0], toHex(color(i)),
+    r1(clamp(spacing + rnd(-2, 2) * i, 6, 60)), r1(rnd(0.2, 0.55) * 100) / 100, {
+      on: i < 2 || Math.random() > 0.5,
+      angle: i === 0 ? 0 : r1(rnd(-12, 12)),
+      wave: Math.random() > 0.6 ? Math.round(rnd(6, 24)) : 0,
+      ox: Math.round(rnd(-90, 90)), oy: Math.round(rnd(-90, 90)),
+      drift: i === 0 ? 0 : r1(rnd(-2, 2)),
+    }));
+  setDesign({ bg: toHex(`hsl(${hue} 40% 6%)`), blend: pick(BLENDS), layers }, -1);
+}
+
+function patchLayer(key, value) {
+  state = { ...state, layers: state.layers.map((l, i) => (i === activeLayer ? { ...l, [key]: value } : l)) };
+  activePreset = -1;
+  render();
+}
+
+/* ---------- UI ---------- */
+
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function slider(field, layer) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  const id = `f-${field.key}`;
+  row.innerHTML = `<label for="${id}">${field.label}</label>
+    <input type="range" id="${id}" min="${field.min}" max="${field.max}" step="${field.step}" value="${layer[field.key]}">
+    <output for="${id}"></output>`;
+  const input = row.querySelector('input');
+  const out = row.querySelector('output');
+  const show = () => { out.textContent = `${Number(input.value)}${field.unit}`; };
+  show();
+  input.addEventListener('input', () => {
+    show();
+    patchLayer(field.key, Number(input.value));
+  });
+  input.addEventListener('change', remember);
+  return row;
+}
+
+function selectRow(layer) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `<label for="f-type">Pattern</label>
+    <select id="f-type">${TYPES.map(([v, n]) => `<option value="${v}"${v === layer.type ? ' selected' : ''}>${n}</option>`).join('')}</select>
+    <span></span>`;
+  row.querySelector('select').addEventListener('change', (e) => { remember(); patchLayer('type', e.target.value); });
+  return row;
+}
+
+function colorRow(layer) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `<label for="f-color">Colour</label>
+    <input type="color" id="f-color" value="${layer.color}"><span></span>`;
+  const input = row.querySelector('input');
+  input.addEventListener('input', () => { patchLayer('color', input.value); syncTabs(); });
+  input.addEventListener('change', remember);
+  return row;
+}
+
+function toggleRow(layer) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.innerHTML = `<label for="f-on">Visible</label>
+    <input type="checkbox" id="f-on"${layer.on ? ' checked' : ''}><span></span>`;
+  row.querySelector('input').addEventListener('change', (e) => {
+    remember();
+    patchLayer('on', e.target.checked);
+    syncTabs();
+  });
+  return row;
+}
+
+function syncLayerControls() {
+  const layer = state.layers[activeLayer];
+  const box = $('layer-controls');
+  box.replaceChildren(toggleRow(layer), selectRow(layer), colorRow(layer), ...FIELDS.map((f) => slider(f, layer)));
+}
+
+function syncTabs() {
+  const tabs = $('tabs');
+  tabs.replaceChildren(...state.layers.map((l, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = `tab${l.on ? '' : ' off'}`;
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', String(i === activeLayer));
+    b.innerHTML = `<i style="background:${l.color}"></i>Layer ${i + 1}`;
+    b.addEventListener('click', () => { activeLayer = i; syncTabs(); syncLayerControls(); });
+    return b;
+  }));
+}
+
+function syncPresets() {
+  document.querySelectorAll('#presets .btn').forEach((b, i) => b.classList.toggle('on', i === activePreset));
+}
+
+function syncUi() {
+  syncTabs();
+  syncLayerControls();
+  syncPresets();
+  $('blend').value = state.blend;
+  $('bg').value = state.bg;
+  const play = $('play');
+  play.textContent = state.playing ? 'Pause' : 'Play';
+  play.setAttribute('aria-pressed', String(state.playing));
+}
+
+function togglePlay() {
+  state = { ...state, playing: !state.playing };
+  syncUi();
+}
+
+function buildPresets() {
+  $('presets').replaceChildren(...PRESETS.map((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn';
+    b.textContent = p.name;
+    b.addEventListener('click', () => setDesign(p, i));
+    return b;
+  }));
+}
+
+function bindGlobal() {
+  $('random').addEventListener('click', randomise);
+  $('undo').addEventListener('click', undo);
+  $('play').addEventListener('click', togglePlay);
+  $('svg').addEventListener('click', exportSvg);
+  $('png').addEventListener('click', exportPng);
+  $('link').addEventListener('click', copyLink);
+  $('reset').addEventListener('click', () => setDesign(PRESETS[0], 0));
+  $('blend').addEventListener('change', (e) => { remember(); state = { ...state, blend: e.target.value }; render(); });
+  $('bg').addEventListener('input', (e) => { state = { ...state, bg: e.target.value }; render(); });
+  $('bg').addEventListener('change', remember);
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (['INPUT', 'SELECT', 'BUTTON', 'TEXTAREA'].includes(tag)) return;
+    if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+    if (e.key === 'r' || e.key === 'R') randomise();
+  });
+  new ResizeObserver(fitCanvas).observe(canvas);
+}
+
+function init() {
+  buildPresets();
+  bindGlobal();
+  loadFromHash();
+  $('undo').disabled = true;
+  syncUi();
+  fitCanvas();
+  requestAnimationFrame((now) => { lastFrame = now; frame(now); });
+}
+
+init();
