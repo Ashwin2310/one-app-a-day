@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beatfield: moiré pattern studio</title>
+  <meta name="description" content="Stack three line, ring, spoke, grid or dot patterns and watch moiré interference bloom. Tweak live, then export PNG or vector SVG.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <h1>Beatfield</h1>
+      <p>moiré studio</p>
+    </div>
+    <div class="actions">
+      <button type="button" id="random" class="btn primary">Randomise</button>
+      <button type="button" id="undo" class="btn">Undo</button>
+      <button type="button" id="play" class="btn" aria-pressed="true">Pause</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stage" aria-label="Preview">
+      <canvas id="canvas" role="img" aria-label="Animated moiré pattern preview"></canvas>
+      <p id="empty" class="empty" hidden>All layers are off. Switch one on to see a pattern.</p>
+    </section>
+
+    <section class="panel" aria-label="Controls">
+      <div class="group">
+        <h2>Presets</h2>
+        <div id="presets" class="chips"></div>
+      </div>
+
+      <div class="group">
+        <div id="tabs" class="tabs" role="tablist" aria-label="Layers"></div>
+        <div id="layer-controls" class="controls" role="tabpanel"></div>
+      </div>
+
+      <div class="group">
+        <h2>Canvas</h2>
+        <div class="row">
+          <label for="blend">Blend</label>
+          <select id="blend">
+            <option value="screen">Screen</option>
+            <option value="difference">Difference</option>
+            <option value="multiply">Multiply</option>
+            <option value="exclusion">Exclusion</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="bg">Background</label>
+          <input type="color" id="bg">
+        </div>
+      </div>
+
+      <div class="group export">
+        <h2>Export</h2>
+        <div class="chips">
+          <button type="button" id="svg" class="btn">SVG</button>
+          <button type="button" id="png" class="btn">PNG</button>
+          <button type="button" id="link" class="btn">Copy link</button>
+          <button type="button" id="reset" class="btn ghost">Reset</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
