@@ -43,5 +43,14 @@
     "category": "design",
     "path": "apps/2026-11-16/",
     "has_screenshot": true
+  },
+  {
+    "day": 6,
+    "date": "2026-11-17",
+    "title": "Emberkeep",
+    "tagline": "A habit tracker whose streaks forgive one slip a week and show you your real patterns.",
+    "category": "utility",
+    "path": "apps/2026-11-17/",
+    "has_screenshot": true
   }
 ]
