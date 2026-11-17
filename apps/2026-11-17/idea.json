@@ -1,0 +1,38 @@
+{
+  "title": "Emberkeep",
+  "tagline": "A habit tracker whose streaks forgive one slip a week and show you your real patterns.",
+  "problem": "Most habit trackers reset your streak to zero after a single missed day, which turns one bad Tuesday into a reason to quit. They also show a number and little else, so you never learn which weekday you fail on or whether you are improving. People who build habits need motivation that survives imperfect weeks and feedback that is actually specific.",
+  "audience": "Anyone building daily or weekly routines (exercise, reading, sleep, study) who has abandoned a streak counter after one slip.",
+  "solution": "Emberkeep counts a streak with a built-in grace day: one miss per rolling seven days is forgiven, so streaks reflect consistency rather than perfection. Every habit gets a 20-week heatmap, a weekday strength chart and plain-language insights computed from your own history.",
+  "how_it_works": [
+    "Each habit stores a colour, a weekly target and a set of completed date keys in localStorage.",
+    "The streak walker steps back from today one day at a time, counting completions.",
+    "A miss is forgiven if no other miss was forgiven in the previous six days; a second miss inside that window ends the streak.",
+    "Today is never counted as a miss until the day is over, so an unchecked habit does not break a live streak.",
+    "Weekday strength is completions divided by opportunities for each day of the week over the last 12 weeks.",
+    "Insights pick the strongest and weakest weekday and compare the last 4 weeks with the 4 before."
+  ],
+  "features": [
+    "One-tap daily check-in with a glowing completion ring",
+    "Streaks with an automatic grace day, shown as a spark when it is used",
+    "20-week heatmap per habit, click any cell to fix a past day",
+    "Weekday strength bars and written insights",
+    "Weekly targets with a this-week progress meter",
+    "Add, edit and delete habits; export and import JSON backups",
+    "Fully offline, works with keyboard only, responsive to 360px"
+  ],
+  "tech_highlights": [
+    "Pure vanilla JS with a single immutable state object and a render function",
+    "Local-date keys avoid timezone and daylight-saving bugs",
+    "Heatmap and charts drawn with CSS grid and inline SVG, no libraries",
+    "Deterministic sample data so the first load already shows rich analytics"
+  ],
+  "try_it": [
+    "Open the app and look at the sample habits and their heatmaps",
+    "Tick a habit for today and watch the ring and streak update",
+    "Click a past heatmap cell to mark or unmark that day",
+    "Add your own habit with the New habit button",
+    "Use Clear sample data to start fresh"
+  ],
+  "linkedin_hook": "Most habit trackers reset your streak after one missed day, so I built one that forgives a slip and shows you the weekday you actually fail on."
+}

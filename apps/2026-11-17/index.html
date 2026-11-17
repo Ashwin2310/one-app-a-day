@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emberkeep: habit streaks that forgive</title>
+<meta name="description" content="A habit tracker with a grace day, 20-week heatmaps, weekday strength charts and written insights. Works offline.">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <h1><span class="flame" aria-hidden="true"></span>Emberkeep</h1>
+  <div class="actions">
+    <button id="newBtn" class="btn primary" type="button">New habit</button>
+    <button id="exportBtn" class="btn" type="button">Export</button>
+    <button id="importBtn" class="btn" type="button">Import</button>
+    <button id="clearBtn" class="btn ghost" type="button" hidden>Clear sample data</button>
+    <input id="importFile" type="file" accept="application/json" hidden aria-label="Import backup file">
+  </div>
+</header>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+<main class="layout">
+  <section class="today" aria-labelledby="todayHead">
+    <div class="ring-wrap">
+      <svg id="ring" viewBox="0 0 120 120" role="img" aria-label="Completed today"></svg>
+      <div class="ring-text"><strong id="ringNum">0/0</strong><span>done today</span></div>
+    </div>
+    <h2 id="todayHead" class="sr">Today</h2>
+    <p id="todayDate" class="date"></p>
+    <ul id="todayList" class="today-list"></ul>
+  </section>
+  <section class="detail" id="detail" aria-live="polite"></section>
+</main>
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2 id="dlgTitle">New habit</h2>
+    <label>Name<input id="fName" maxlength="40" required autocomplete="off"></label>
+    <label>Weekly target: <output id="fTargetOut">5</output> days
+      <input id="fTarget" type="range" min="1" max="7" value="5"></label>
+    <fieldset><legend>Colour</legend><div id="swatches" class="swatches"></div></fieldset>
+    <p id="formErr" class="err" role="alert"></p>
+    <div class="row">
+      <button type="button" id="cancelBtn" class="btn">Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>
