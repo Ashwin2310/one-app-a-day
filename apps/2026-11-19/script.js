@@ -79,7 +79,7 @@
             for (const s of [seg, seg.slice().reverse()]) {
               const cand = [...rest.slice(0, k), ...s, ...rest.slice(k)];
               const l = length(cand);
-              if (l < curLen - 1e-9) { cur = cand; curLen = l; improved = true; yield { order: cur, fixed }; break; }
+              if (l < curLen - 1e-9) { cur = cand; curLen = l; fixed++; improved = true; yield { order: cur, fixed }; break; }
             }
           }
         }
@@ -97,14 +97,14 @@
       if (r.done) { finishSolve(r.value); return; }
       if (r.value) { state.route = r.value.order; solver.fixed = r.value.fixed; solver.dirty = true; if (!reduce) break; }
     }
-    $('status').textContent = 'Optimizing… ' + solver.fixed + ' crossings fixed';
+    $('status').textContent = 'Optimizing… ' + solver.fixed + ' improvements applied';
     if (solver.dirty) { solver.dirty = false; renderStats(); }
   }
 
   function finishSolve(v) {
     state.optimized = true;
     state.route = v.order;
-    $('status').textContent = 'Local optimum reached, ' + v.fixed + ' crossings removed';
+    $('status').textContent = 'Local optimum reached, ' + v.fixed + ' improving moves applied';
     solver = null;
     $('btn-opt').textContent = 'Optimize';
     renderAll();
