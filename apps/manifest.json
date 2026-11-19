@@ -52,5 +52,14 @@
     "category": "utility",
     "path": "apps/2026-11-17/",
     "has_screenshot": true
+  },
+  {
+    "day": 7,
+    "date": "2026-11-19",
+    "title": "Shortloop",
+    "tagline": "Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.",
+    "category": "problem-solving",
+    "path": "apps/2026-11-19/",
+    "has_screenshot": true
   }
 ]
