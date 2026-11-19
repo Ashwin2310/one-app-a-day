@@ -1,0 +1,36 @@
+{
+  "title": "Shortloop",
+  "tagline": "Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.",
+  "problem": "Anyone running a Saturday of errands, deliveries or site visits ends up zig-zagging across town because they visit stops in the order they thought of them. Map apps give directions between points but rarely reorder the stops, and real route optimisers are paid, account-gated tools built for fleets.",
+  "audience": "People with a list of stops to hit in one trip: errand runners, couriers, home-visit nurses, field sales reps and weekend planners.",
+  "solution": "Shortloop lets you click stops onto a street-grid map, then solves the travelling-salesman route in your browser. It starts from a nearest-neighbour guess and improves it with 2-opt and Or-opt moves you can watch untangle the path, showing distance and time saved against your original order.",
+  "how_it_works": [
+    "Your stops become points; the distance between two stops is straight-line or street-grid (Manhattan) distance, whichever you pick.",
+    "Your own click order is kept as the baseline so savings are measured against what you would really have done.",
+    "A nearest-neighbour pass builds a decent first loop from the chosen start stop.",
+    "2-opt repeatedly reverses a segment of the route whenever that removes two crossing edges and shortens the loop.",
+    "Or-opt moves runs of one to three stops to a better position in the loop, fixing what 2-opt cannot.",
+    "The search stops when no move helps, and every improvement is drawn live so you see the tangle resolve."
+  ],
+  "features": [
+    "Click to add stops, drag to move them, double-click to remove, and name each one",
+    "Live animated solver with speed control, shown as a before/after route comparison",
+    "Straight-line or street-grid distance, with walking, cycling or driving time estimates",
+    "Pick any stop as the start and choose a round trip or a one-way route",
+    "Sample city presets and a random-stops generator for stress testing up to 60 stops",
+    "Ordered itinerary list you can copy as text, with automatic saving in localStorage"
+  ],
+  "tech_highlights": [
+    "2-opt and Or-opt local search implemented from scratch with an incremental delta check, no libraries",
+    "Solver runs in time slices with requestAnimationFrame so the UI never freezes, even at 60 stops",
+    "HiDPI canvas rendering with an animated route flow and pointer-events based dragging for mouse and touch",
+    "Fully keyboard-operable stop list and a state model that serialises to localStorage"
+  ],
+  "try_it": [
+    "Open the app and press Optimize on the pre-loaded sample city to watch the tangled route resolve.",
+    "Click the map to add a few of your own stops and drag one to a new spot.",
+    "Switch distance mode to street grid and notice the route reshape.",
+    "Press Copy itinerary to take the ordered list with you."
+  ],
+  "linkedin_hook": "I stopped zig-zagging across town the day I let 2-opt reorder my errands, and I wrote the solver from scratch in plain JavaScript."
+}

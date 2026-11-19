@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shortloop: shortest route for your errands</title>
+<meta name="description" content="Drop stops on a city map and watch 2-opt and Or-opt untangle them into the shortest loop, with distance and time saved.">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Short<span>loop</span></h1>
+    <p class="tag">Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.</p>
+  </div>
+  <div class="actions">
+    <button id="btn-sample" type="button">Sample city</button>
+    <button id="btn-random" type="button">Add 5 random</button>
+    <button id="btn-clear" type="button">Clear</button>
+  </div>
+</header>
+<main class="layout">
+  <section class="mapwrap" aria-label="Map">
+    <canvas id="map" tabindex="0" aria-label="City map. Click to add a stop, drag stops to move them, double-click a stop to remove it."></canvas>
+    <p id="empty" class="empty" hidden>Click the map to drop your first stop.</p>
+    <p id="status" class="badge" role="status"></p>
+    <div class="legend"><i class="l1"></i> Your order <i class="l2"></i> Optimized</div>
+  </section>
+  <aside class="panel">
+    <div class="stats">
+      <div><span class="k">Distance</span><b id="s-dist">0</b></div>
+      <div><span class="k">Saved</span><b id="s-saved" class="good">0%</b></div>
+      <div><span class="k">Time</span><b id="s-time">0</b></div>
+    </div>
+    <div class="row">
+      <button id="btn-opt" class="primary" type="button">Optimize</button>
+      <label class="speed">Speed <input id="speed" type="range" min="1" max="10" value="5" aria-label="Solver speed"></label>
+    </div>
+    <div class="row">
+      <fieldset><legend>Distance</legend>
+        <label><input type="radio" name="metric" value="line" checked> Straight</label>
+        <label><input type="radio" name="metric" value="grid"> Street grid</label>
+      </fieldset>
+      <fieldset><legend>Travel</legend>
+        <label><input type="radio" name="travel" value="walk"> Walk</label>
+        <label><input type="radio" name="travel" value="bike"> Bike</label>
+        <label><input type="radio" name="travel" value="car" checked> Car</label>
+      </fieldset>
+    </div>
+    <label class="check"><input id="round" type="checkbox" checked> Round trip (return to start)</label>
+    <h2>Itinerary</h2>
+    <ol id="list" class="list"></ol>
+    <button id="btn-copy" type="button">Copy itinerary</button>
+  </aside>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
