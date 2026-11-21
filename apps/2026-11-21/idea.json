@@ -1,0 +1,36 @@
+{
+  "title": "Ridgeprint",
+  "tagline": "Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG.",
+  "problem": "Topographic line art is everywhere in posters, slide backgrounds, packaging and outdoor brands, but designers usually grab a stock raster file in the wrong colours or trace one by hand. Real contour lines come from elevation data and an isoline algorithm, so making a custom, editable vector version normally means GIS software or writing code.",
+  "audience": "Designers, illustrators, front-end developers and pen-plotter hobbyists who want a custom topographic pattern they can recolour and edit as vectors.",
+  "solution": "Ridgeprint generates a seeded terrain from layered noise, then traces true contour lines through it with marching squares and joins them into smooth paths. You can raise peaks and carve valleys by painting on the map, restyle everything live, and export a tidy SVG, a PNG or a ready-to-paste CSS background.",
+  "how_it_works": [
+    "A height field is built on a grid from several octaves of seeded value noise, shaped by a ridge and sharpness control and any hills or valleys you paint.",
+    "Heights are normalised to 0..1 and split into evenly spaced contour levels.",
+    "For every level, marching squares inspects each grid cell's four corners and emits the line segment where the terrain crosses that height, interpolated along the cell edges.",
+    "Loose segments are stitched end to end into long polylines and closed rings using an endpoint hash, so each contour is one path instead of thousands of fragments.",
+    "Paths are smoothed with Chaikin corner cutting and drawn to canvas, with every Nth line drawn heavier as an index contour, like a real survey map.",
+    "Exports reuse the same paths, so the SVG has one grouped path per level and matches the screen exactly."
+  ],
+  "features": [
+    "Paint to raise hills or carve valleys, with brush size and strength, plus undo",
+    "Live sliders for seed, scale, detail, ridge sharpness, number of levels and line weight",
+    "Index contours every Nth level and an optional filled elevation-band mode",
+    "Six curated palettes plus custom ink and paper colours",
+    "Export layered SVG, a 2x PNG, or copy a CSS background-image snippet",
+    "Shareable link that encodes the whole design, and automatic saving in localStorage"
+  ],
+  "tech_highlights": [
+    "Marching squares with saddle-case disambiguation and edge interpolation, written from scratch",
+    "Segment stitching through a quantised endpoint map turns fragments into continuous paths in linear time",
+    "Seeded PRNG and value noise make every design reproducible from a short settings string",
+    "Rendering is debounced into requestAnimationFrame so dragging sliders and painting stay smooth"
+  ],
+  "try_it": [
+    "Open the app and look at the pre-generated mountain range, then press Shuffle seed a few times.",
+    "Pick the Raise brush and drag across the map to push up a new ridge; switch to Carve to cut a valley.",
+    "Change the palette to Blueprint and turn on Filled bands.",
+    "Press Export SVG and open the file in your design tool: every contour is a clean editable path."
+  ],
+  "linkedin_hook": "Every topo-line poster you've seen started as a height map and one quiet algorithm called marching squares, so I built a studio where you sculpt the mountain yourself."
+}
