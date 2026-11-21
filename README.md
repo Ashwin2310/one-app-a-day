@@ -2,10 +2,11 @@
 
 A new single-page web app every day: algorithms and in-browser AI, creative design tools, and everyday utilities with extra features. Each one comes with a write-up explaining the problem and how the app solves it.
 
-**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 7 apps so far
+**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 8 apps so far
 
 | Day | Date | App | Category | Links |
 |---:|---|---|---|---|
+| 8 | 2026-11-21 | **Ridgeprint**<br><sub>Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG.</sub> | 🎨 Design | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-21/) · [Write-up](apps/2026-11-21/README.md) |
 | 7 | 2026-11-19 | **Shortloop**<br><sub>Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.</sub> | 🧠 Problem solving / AI | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-19/) · [Write-up](apps/2026-11-19/README.md) |
 | 6 | 2026-11-17 | **Emberkeep**<br><sub>A habit tracker whose streaks forgive one slip a week and show you your real patterns.</sub> | 🛠️ Utility | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-17/) · [Write-up](apps/2026-11-17/README.md) |
 | 5 | 2026-11-16 | **Beatfield**<br><sub>A moiré studio: stack three line, ring or dot patterns and watch the interference bloom.</sub> | 🎨 Design | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-16/) · [Write-up](apps/2026-11-16/README.md) |

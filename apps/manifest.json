@@ -61,5 +61,14 @@
     "category": "problem-solving",
     "path": "apps/2026-11-19/",
     "has_screenshot": true
+  },
+  {
+    "day": 8,
+    "date": "2026-11-21",
+    "title": "Ridgeprint",
+    "tagline": "Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG.",
+    "category": "design",
+    "path": "apps/2026-11-21/",
+    "has_screenshot": true
   }
 ]

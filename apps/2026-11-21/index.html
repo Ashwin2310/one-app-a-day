@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ridgeprint: sculpt topographic contour art</title>
+  <meta name="description" content="Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG, PNG or a CSS background. Marching squares in plain JavaScript.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <h1>Ridgeprint</h1>
+      <p>Sculpt a terrain, export its contour lines.</p>
+    </div>
+    <div class="actions">
+      <button type="button" id="copyLink" class="btn ghost">Copy link</button>
+      <button type="button" id="copyCss" class="btn ghost">Copy CSS</button>
+      <button type="button" id="exportPng" class="btn ghost">PNG</button>
+      <button type="button" id="exportSvg" class="btn primary">Export SVG</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stage" aria-label="Contour map">
+      <div class="frame" id="frame">
+        <canvas id="map" tabindex="0" aria-label="Topographic contour map. Use R, C or L to pick Raise, Carve or Look. Arrow keys move the brush, Enter applies it."></canvas>
+        <div class="ring" id="ring" aria-hidden="true"></div>
+      </div>
+      <div class="readout">
+        <span id="elev" aria-live="off">Hover the map to read elevation</span>
+        <span id="stats" class="stats"></span>
+      </div>
+      <p class="hint"><strong>Drag on the map</strong> to raise a peak, switch to <strong>Carve</strong> for valleys, <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Z</kbd> to undo. Every export is the same vector geometry you see.</p>
+    </section>
+
+    <aside class="panel" aria-label="Controls">
+      <fieldset>
+        <legend>Terrain</legend>
+        <div class="row seedrow">
+          <label for="seed">Seed</label>
+          <input type="number" id="seed" min="0" max="999999" step="1" inputmode="numeric">
+          <button type="button" id="shuffle" class="btn small">Shuffle</button>
+        </div>
+        <div class="slider"><label for="scale">Scale <output id="scaleOut"></output></label><input type="range" id="scale" min="0.15" max="1.6" step="0.01"></div>
+        <div class="slider"><label for="detail">Detail <output id="detailOut"></output></label><input type="range" id="detail" min="1" max="6" step="1"></div>
+        <div class="slider"><label for="ridge">Ridges <output id="ridgeOut"></output></label><input type="range" id="ridge" min="0" max="1" step="0.01"></div>
+        <div class="slider"><label for="sharp">Sharpness <output id="sharpOut"></output></label><input type="range" id="sharp" min="0.5" max="2.5" step="0.01"></div>
+        <label class="check"><input type="checkbox" id="drift"> Drift (animate terrain)</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Contours</legend>
+        <div class="slider"><label for="levels">Levels <output id="levelsOut"></output></label><input type="range" id="levels" min="4" max="48" step="1"></div>
+        <div class="slider"><label for="weight">Line weight <output id="weightOut"></output></label><input type="range" id="weight" min="0.4" max="4" step="0.1"></div>
+        <div class="row">
+          <span class="lab" id="indexLab">Index line every</span>
+          <div class="seg" role="radiogroup" aria-labelledby="indexLab" id="indexSeg"></div>
+        </div>
+        <label class="check"><input type="checkbox" id="fill"> Filled elevation bands</label>
+        <label class="check"><input type="checkbox" id="smooth"> Smooth curves</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Colour</legend>
+        <div class="swatches" id="swatches" role="radiogroup" aria-label="Palette"></div>
+        <div class="pickers">
+          <label>Paper <input type="color" id="cPaper"></label>
+          <label>Ink <input type="color" id="cInk"></label>
+          <label>Low band <input type="color" id="cLow"></label>
+          <label>High band <input type="color" id="cHigh"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Sculpt</legend>
+        <div class="seg wide" role="radiogroup" aria-label="Brush tool" id="toolSeg"></div>
+        <div class="slider"><label for="size">Brush size <output id="sizeOut"></output></label><input type="range" id="size" min="0.03" max="0.3" step="0.005"></div>
+        <div class="slider"><label for="strength">Strength <output id="strengthOut"></output></label><input type="range" id="strength" min="0.05" max="1" step="0.01"></div>
+        <div class="row buttons">
+          <button type="button" id="undo" class="btn small">Undo</button>
+          <button type="button" id="flatten" class="btn small">Flatten</button>
+          <button type="button" id="reset" class="btn small">Reset design</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Frame</legend>
+        <div class="seg wide" role="radiogroup" aria-label="Aspect ratio" id="aspectSeg"></div>
+      </fieldset>
+    </aside>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
