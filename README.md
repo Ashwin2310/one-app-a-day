@@ -2,10 +2,11 @@
 
 A new single-page web app every day: algorithms and in-browser AI, creative design tools, and everyday utilities with extra features. Each one comes with a write-up explaining the problem and how the app solves it.
 
-**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 8 apps so far
+**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 9 apps so far
 
 | Day | Date | App | Category | Links |
 |---:|---|---|---|---|
+| 9 | 2026-11-22 | **Dueweave**<br><sub>A to-do list that plans your working hours and warns you before a deadline slips.</sub> | 🛠️ Utility | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-22/) · [Write-up](apps/2026-11-22/README.md) |
 | 8 | 2026-11-21 | **Ridgeprint**<br><sub>Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG.</sub> | 🎨 Design | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-21/) · [Write-up](apps/2026-11-21/README.md) |
 | 7 | 2026-11-19 | **Shortloop**<br><sub>Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.</sub> | 🧠 Problem solving / AI | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-19/) · [Write-up](apps/2026-11-19/README.md) |
 | 6 | 2026-11-17 | **Emberkeep**<br><sub>A habit tracker whose streaks forgive one slip a week and show you your real patterns.</sub> | 🛠️ Utility | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-17/) · [Write-up](apps/2026-11-17/README.md) |
@@ -17,4 +18,4 @@ A new single-page web app every day: algorithms and in-browser AI, creative desi
 
 ## How this works
 
-Once a day a scheduled job picks the next category (problem solving, design, utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under `apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in `DAILY_TASK.md`.
+Once a day a scheduled Claude Code task picks the next category (problem solving, design, utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under `apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in `DAILY_TASK.md`.

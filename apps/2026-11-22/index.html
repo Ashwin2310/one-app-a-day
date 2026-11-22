@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dueweave: a to-do list that plans your hours</title>
+  <meta name="description" content="Dueweave ranks your tasks by importance and deadline slack, lays them onto your working hours and warns you before a deadline slips.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="3" width="26" height="26" rx="8" fill="#1B2428" stroke="#26332F"/>
+        <path d="M8 11h16M8 16h16M8 21h16" stroke="#5BE3B0" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M12 8v16M20 8v16" stroke="#A497FF" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="3 2.4"/>
+      </svg>
+      <div>
+        <h1>Dueweave</h1>
+        <p class="stats" id="stats" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="actions">
+      <details class="pop" id="hoursPop">
+        <summary class="btn" id="hoursBtn">Hours</summary>
+        <div class="pop-body">
+          <label>Day starts
+            <select id="dayStart"></select>
+          </label>
+          <label>Day ends
+            <select id="dayEnd"></select>
+          </label>
+          <label class="check"><input type="checkbox" id="weekends"> Work weekends</label>
+        </div>
+      </details>
+      <button class="btn" id="copyBtn" type="button">Copy plan</button>
+      <details class="pop" id="morePop">
+        <summary class="btn icon" aria-label="More options">⋯</summary>
+        <div class="pop-body menu">
+          <button type="button" id="sampleBtn">Load sample tasks</button>
+          <button type="button" id="clearBtn" class="danger">Clear all tasks</button>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="upnext" id="upnext" aria-label="Up next"></section>
+
+    <div class="banner" id="banner" role="status"></div>
+
+    <form class="quick" id="quickForm" autocomplete="off">
+      <label for="quickInput" class="sr-only">Add a task</label>
+      <div class="quick-row">
+        <span class="plus" aria-hidden="true">+</span>
+        <input id="quickInput" type="text" maxlength="200" placeholder='Try "Prep slides 90m !high by thu 3pm #work"' aria-describedby="chips">
+        <button class="btn primary" type="submit">Add</button>
+      </div>
+      <div class="chips" id="chips" aria-live="polite"></div>
+    </form>
+
+    <div class="grid">
+      <section class="panel list-panel" aria-labelledby="listTitle">
+        <div class="panel-head">
+          <h2 id="listTitle">Ranked tasks</h2>
+          <div class="filters" id="filters" role="group" aria-label="Filter by tag"></div>
+        </div>
+        <ol class="tasks" id="tasks"></ol>
+        <details class="done-box" id="doneBox">
+          <summary id="doneSummary">Done</summary>
+          <ul class="done-list" id="doneList"></ul>
+        </details>
+      </section>
+
+      <section class="panel plan-panel" aria-labelledby="planTitle">
+        <div class="panel-head">
+          <h2 id="planTitle">Your next five working days</h2>
+          <span class="legend"><i class="dot ok"></i>on track <i class="dot tight"></i>tight <i class="dot late"></i>late</span>
+        </div>
+        <div class="timeline" id="timeline"></div>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="editDialog" aria-labelledby="editTitle">
+    <form method="dialog" id="editForm">
+      <h2 id="editTitle">Edit task</h2>
+      <label>Title <input id="fTitle" type="text" maxlength="120" required></label>
+      <div class="two">
+        <label>Minutes <input id="fMinutes" type="number" min="5" max="1440" step="5" required></label>
+        <label>Importance
+          <select id="fImportance">
+            <option value="1">Low</option>
+            <option value="2">Normal</option>
+            <option value="3">High</option>
+          </select>
+        </label>
+      </div>
+      <label>Deadline <input id="fDue" type="datetime-local"></label>
+      <label>Tag <input id="fTag" type="text" maxlength="24" placeholder="work"></label>
+      <div class="dialog-actions">
+        <button type="button" class="btn danger" id="deleteBtn">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn primary" id="saveBtn">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

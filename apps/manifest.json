@@ -70,5 +70,14 @@
     "category": "design",
     "path": "apps/2026-11-21/",
     "has_screenshot": true
+  },
+  {
+    "day": 9,
+    "date": "2026-11-22",
+    "title": "Dueweave",
+    "tagline": "A to-do list that plans your working hours and warns you before a deadline slips.",
+    "category": "utility",
+    "path": "apps/2026-11-22/",
+    "has_screenshot": true
   }
 ]
