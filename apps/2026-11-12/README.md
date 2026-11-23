@@ -61,4 +61,4 @@ Download this folder and open `index.html` in any browser. That's it.
 
 ---
 
-<sub>Part of a daily build series: one new app every day, planned, storyboarded and built with Claude Code, then published automatically.</sub>
+<sub>Part of a daily build series: one new app every day, planned, storyboarded, built and published automatically.</sub>

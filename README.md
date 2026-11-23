@@ -18,4 +18,4 @@ A new single-page web app every day: algorithms and in-browser AI, creative desi
 
 ## How this works
 
-Once a day a scheduled Claude Code task picks the next category (problem solving, design, utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under `apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in `DAILY_TASK.md`.
+Once a day a scheduled job picks the next category (problem solving, design, utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under `apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in `DAILY_TASK.md`.

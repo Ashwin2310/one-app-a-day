@@ -63,8 +63,8 @@ Download this folder and open `index.html` in any browser. That's it.
 
 ---
 
-<sub>Part of a daily build series: one new app every day, planned, storyboarded and built \
-with Claude Code, then published automatically.</sub>
+<sub>Part of a daily build series: one new app every day, planned, storyboarded, built and \
+published automatically.</sub>
 """
 
 
@@ -89,7 +89,7 @@ and how the app solves it.
 
 ## How this works
 
-Once a day a scheduled Claude Code task picks the next category (problem solving, design, \
+Once a day a scheduled job picks the next category (problem solving, design, \
 utility), brainstorms a fresh idea, storyboards it screen by screen, builds it in plain \
 HTML/CSS/JS, tests it in a headless browser, writes the README and publishes it here under \
 `apps/YYYY-MM-DD/`. The publishing tool lives in `publish.py`; the daily instructions are in \
