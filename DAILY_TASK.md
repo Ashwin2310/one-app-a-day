@@ -11,8 +11,16 @@ Run `.venv/bin/python publish.py plan`. It pulls the latest code and prints JSON
 
 - If `already_published` is true, stop: today is done. Report "Already published today".
 - Otherwise remember `folder` (e.g. `apps/2026-11-11/`) and `category`.
+- `plan` also reports `resumed_from`, `resumed_title` and `existing_files`. When an earlier run
+  stopped part-way (usage limit, computer asleep), its unfinished app of the same category is
+  moved into today's folder. If `existing_files` is not empty, **finish that app instead of
+  starting a new one**: read what is there, keep its `idea.json` and `STORYBOARD.md`, and
+  continue from the first missing step below. Re-check any existing code against the storyboard
+  rather than trusting it.
 
 ## 2. Idea
+
+(Skip this and step 3 when `idea.json` and `STORYBOARD.md` already exist.)
 
 Brainstorm 5 candidate ideas that fit `category_brief`, then pick the single best one by:
 a real, specific problem; impressive within 10 seconds of opening; buildable well in one page;

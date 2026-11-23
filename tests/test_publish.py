@@ -82,6 +82,30 @@ def test_plan_rotates_categories_and_flags_published(tmp_path):
         load_manifest(tmp_path)
 
 
+def test_plan_resumes_a_draft_of_the_same_category(tmp_path):
+    apps = tmp_path / "apps"
+    apps.mkdir()
+    (apps / "manifest.json").write_text("[]")  # day 1 is problem-solving
+    draft = apps / "draft-x"
+    draft.mkdir()
+    (draft / "idea.json").write_text(json.dumps(IDEA))
+    (draft / "STORYBOARD.md").write_text("# S")
+    (draft / ".plan.json").write_text(json.dumps({"category": "design"}))
+    plan = plan_today(tmp_path, date(2026, 11, 24))
+    assert plan["resumed_from"] is None and plan["existing_files"] == [] and draft.exists()
+
+    (apps / "2026-11-24/.plan.json").unlink()
+    (apps / "2026-11-24").rmdir()
+    (draft / ".plan.json").write_text(json.dumps({"category": "problem-solving"}))
+    plan = plan_today(tmp_path, date(2026, 11, 24))
+    today = apps / "2026-11-24"
+    assert plan["resumed_from"] == "draft-x" and plan["resumed_title"] == "Route <Fox>"
+    assert plan["existing_files"] == ["STORYBOARD.md", "idea.json"] and not draft.exists()
+    assert json.loads((today / ".plan.json").read_text())["category"] == "problem-solving"
+    again = plan_today(tmp_path, date(2026, 11, 24))
+    assert again["resumed_from"] is None and again["existing_files"] == ["STORYBOARD.md", "idea.json"]
+
+
 def test_validate_folder_errors(tmp_path):
     with pytest.raises(PipelineError, match="does not exist"):
         publish.validate_folder(tmp_path / "nope")
