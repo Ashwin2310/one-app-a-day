@@ -2,10 +2,11 @@
 
 A new single-page web app every day: algorithms and in-browser AI, creative design tools, and everyday utilities with extra features. Each one comes with a write-up explaining the problem and how the app solves it.
 
-**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 9 apps so far
+**[Browse the live gallery](https://ashwin2310.github.io/one-app-a-day/)** · 10 apps so far
 
 | Day | Date | App | Category | Links |
 |---:|---|---|---|---|
+| 10 | 2026-11-23 | **Rotamint**<br><sub>Drop in your team and their limits; simulated annealing hands back a fair 4-week rota.</sub> | 🧠 Problem solving / AI | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-23/) · [Write-up](apps/2026-11-23/README.md) |
 | 9 | 2026-11-22 | **Dueweave**<br><sub>A to-do list that plans your working hours and warns you before a deadline slips.</sub> | 🛠️ Utility | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-22/) · [Write-up](apps/2026-11-22/README.md) |
 | 8 | 2026-11-21 | **Ridgeprint**<br><sub>Sculpt a terrain with your cursor and export its contour lines as clean, layered SVG.</sub> | 🎨 Design | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-21/) · [Write-up](apps/2026-11-21/README.md) |
 | 7 | 2026-11-19 | **Shortloop**<br><sub>Drop your errands on a city map and watch 2-opt untangle them into the shortest loop.</sub> | 🧠 Problem solving / AI | [Demo](https://ashwin2310.github.io/one-app-a-day/apps/2026-11-19/) · [Write-up](apps/2026-11-19/README.md) |

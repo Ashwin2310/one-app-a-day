@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rotamint: fair shift rotas by simulated annealing</title>
+  <meta name="description" content="Enter your team's availability, time off and weekly limits; a from-scratch simulated annealing solver builds a fair four-week shift rota in your browser.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Rotamint</h1>
+        <p>Fair four-week shift rotas, solved in your browser</p>
+      </div>
+    </div>
+    <div class="tools">
+      <button id="solve" class="primary" type="button">Re-solve</button>
+      <label class="field">People / shift
+        <select id="perShift">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </label>
+      <label class="field">Seed <input id="seed" type="number" min="1" max="99999" inputmode="numeric"></label>
+      <button id="csv" type="button">Export CSV</button>
+      <button id="copy" type="button">Copy text</button>
+      <button id="reset" class="ghost" type="button">Reset</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel rota-wrap" aria-labelledby="rotaH">
+      <div class="rota-head">
+        <h2 id="rotaH">Rota</h2>
+        <span id="range" class="muted"></span>
+        <span class="hint">Click a shift to pin it · hover a name to trace it</span>
+      </div>
+      <div id="rota" class="rota"></div>
+    </section>
+
+    <aside class="side">
+      <section class="panel score" aria-labelledby="scoreH">
+        <h2 id="scoreH" class="sr-only">Solver</h2>
+        <div id="badge" class="badge">Solving…</div>
+        <dl class="nums">
+          <div><dt>Cost</dt><dd id="cost">0</dd></div>
+          <div><dt>Temperature</dt><dd id="temp">–</dd></div>
+          <div><dt>Moves tried</dt><dd id="iters">0</dd></div>
+        </dl>
+        <canvas id="curve" role="img" aria-label="Cost curve of the last solve"></canvas>
+        <p class="caption"><span class="key best"></span>best cost <span class="key cur"></span>current cost</p>
+      </section>
+
+      <section class="panel" aria-labelledby="fairH">
+        <h2 id="fairH">Fairness</h2>
+        <p class="caption"><span class="key k-shift"></span>shifts <span class="key k-night"></span>nights <span class="key k-wknd"></span>weekend shifts</p>
+        <div id="fair" class="fair"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="reportH">
+        <h2 id="reportH">Rule report</h2>
+        <ul id="report" class="report"></ul>
+      </section>
+    </aside>
+
+    <section class="panel team" aria-labelledby="teamH">
+      <h2 id="teamH">Team</h2>
+      <div id="people" class="people"></div>
+      <button id="add" class="add" type="button">+ Add person</button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

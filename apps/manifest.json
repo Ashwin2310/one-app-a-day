@@ -79,5 +79,14 @@
     "category": "utility",
     "path": "apps/2026-11-22/",
     "has_screenshot": true
+  },
+  {
+    "day": 10,
+    "date": "2026-11-23",
+    "title": "Rotamint",
+    "tagline": "Drop in your team and their limits; simulated annealing hands back a fair 4-week rota.",
+    "category": "problem-solving",
+    "path": "apps/2026-11-23/",
+    "has_screenshot": true
   }
 ]
