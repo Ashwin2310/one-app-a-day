@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huestair: one colour to an accessible OKLCH palette</title>
+  <meta name="description" content="Turn one brand colour into a full OKLCH palette with contrast-even steps, a tinted neutral, semantic ramps, a contrast matrix, a light and dark preview and CSS, Tailwind, token and SVG export.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brandmark">
+      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <div>
+        <h1>Huestair</h1>
+        <p>One colour in. An accessible palette out.</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="surprise">Surprise me</button>
+      <button type="button" class="btn ghost" id="share">Share link</button>
+      <button type="button" class="btn primary" id="openExport">Export</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel" aria-label="Palette controls">
+      <section class="group">
+        <h2>Brand</h2>
+        <div class="hexrow">
+          <input type="color" id="brandPicker" aria-label="Pick brand colour">
+          <label class="sr" for="brandHex">Brand hex</label>
+          <input type="text" id="brandHex" spellcheck="false" autocomplete="off" maxlength="7" aria-describedby="hexMsg">
+        </div>
+        <p class="msg" id="hexMsg" role="status"></p>
+        <label class="field" for="harmony">Accent harmony
+          <select id="harmony">
+            <option value="complement">Complement (180°)</option>
+            <option value="split">Split (150°)</option>
+            <option value="triadic">Triadic (120°)</option>
+            <option value="analogous">Analogous (40°)</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="group">
+        <h2 id="curveLab">Lightness curve</h2>
+        <div class="seg" role="radiogroup" aria-labelledby="curveLab" id="curveSeg">
+          <button type="button" role="radio" data-v="linear">Linear</button>
+          <button type="button" role="radio" data-v="eased">Eased</button>
+          <button type="button" role="radio" data-v="even">Contrast-even</button>
+        </div>
+        <p class="note" id="neighbour"></p>
+        <div class="slider"><label for="lightest">Lightest <output id="lightestOut"></output></label><input type="range" id="lightest" min="0.85" max="0.995" step="0.005"></div>
+        <div class="slider"><label for="darkest">Darkest <output id="darkestOut"></output></label><input type="range" id="darkest" min="0.1" max="0.45" step="0.005"></div>
+        <div class="slider"><label for="chroma">Chroma <output id="chromaOut"></output></label><input type="range" id="chroma" min="0.3" max="1.4" step="0.01"></div>
+        <div class="slider"><label for="drift">Hue drift <output id="driftOut"></output></label><input type="range" id="drift" min="-20" max="20" step="1"></div>
+        <div class="slider"><label for="tint">Neutral tint <output id="tintOut"></output></label><input type="range" id="tint" min="0" max="0.04" step="0.001"></div>
+        <label class="check"><input type="checkbox" id="pin"> Pin exact brand colour</label>
+      </section>
+
+      <section class="group">
+        <h2>Custom ramps</h2>
+        <ul class="extras" id="extras"></ul>
+        <button type="button" class="btn small" id="addRamp">+ Add ramp</button>
+        <button type="button" class="btn small ghost" id="reset">Reset all</button>
+      </section>
+    </aside>
+
+    <div class="content">
+      <section class="ramps-wrap" aria-label="Colour ramps">
+        <div class="steps-head" aria-hidden="true" id="stepsHead"></div>
+        <div class="ramps" id="ramps" role="grid" aria-label="Palette swatches. Use arrow keys to move, Enter to copy."></div>
+      </section>
+
+      <section class="inspector" id="inspector" aria-live="polite"></section>
+
+      <div class="duo">
+        <section class="card">
+          <div class="card-head">
+            <h2>Lightness &amp; chroma</h2>
+            <span class="legend" id="chartLegend"></span>
+          </div>
+          <svg id="chart" viewBox="0 0 520 260" role="img" aria-label="Lightness and chroma per step for each ramp"></svg>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2 id="previewLab">Live preview</h2>
+            <div class="seg small" role="radiogroup" aria-labelledby="previewLab" id="themeSeg">
+              <button type="button" role="radio" data-v="light">Light</button>
+              <button type="button" role="radio" data-v="dark">Dark</button>
+            </div>
+          </div>
+          <div class="preview" id="preview">
+            <div class="pv-card">
+              <div class="pv-top">
+                <span class="pv-avatar" aria-hidden="true">H</span>
+                <div>
+                  <strong>Quarterly launch</strong>
+                  <small>Design system · updated today</small>
+                </div>
+                <span class="pv-badge">New</span>
+              </div>
+              <p class="pv-body">Every colour on this card comes from the generated palette, so you can judge it before writing a line of CSS.</p>
+              <label class="pv-label" for="pvInput">Workspace name</label>
+              <input class="pv-input" id="pvInput" type="text" value="Acme design" tabindex="-1">
+              <div class="pv-buttons">
+                <span class="pv-btn primary">Publish</span>
+                <span class="pv-btn secondary">Save draft</span>
+                <span class="pv-btn accent">Invite</span>
+              </div>
+            </div>
+            <div class="pv-alerts">
+              <div class="pv-alert success"><b>Saved.</b> <span id="pvSuccess"></span></div>
+              <div class="pv-alert warning"><b>Heads up.</b> <span id="pvWarning"></span></div>
+              <div class="pv-alert danger"><b>Delete workspace?</b> This cannot be undone.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Contrast matrix</h2>
+          <label class="inline" for="matrixRamp">Ramp <select id="matrixRamp"></select></label>
+        </div>
+        <p class="note">Rows are text colour, columns are background. <b>AAA</b> 7 : 1, <b>AA</b> 4.5 : 1, <b>A+</b> 3 : 1 (large text and UI).</p>
+        <div class="matrix-scroll">
+          <table class="matrix" id="matrix"></table>
+        </div>
+      </section>
+
+      <footer class="foot">Built with OKLab maths in plain JavaScript. Nothing leaves your browser.</footer>
+    </div>
+  </main>
+
+  <dialog id="exportDlg" aria-labelledby="exportTitle">
+    <div class="dlg-head">
+      <h2 id="exportTitle">Export palette</h2>
+      <button type="button" class="btn ghost small" id="closeExport" aria-label="Close export">✕</button>
+    </div>
+    <div class="tabs" role="tablist" id="exportTabs">
+      <button type="button" role="tab" data-v="css">CSS</button>
+      <button type="button" role="tab" data-v="tailwind">Tailwind</button>
+      <button type="button" role="tab" data-v="tokens">Tokens JSON</button>
+      <button type="button" role="tab" data-v="svg">SVG sheet</button>
+    </div>
+    <div class="dlg-opts">
+      <span id="fmtLab">Values</span>
+      <div class="seg small" role="radiogroup" aria-labelledby="fmtLab" id="fmtSeg">
+        <button type="button" role="radio" data-v="hex">Hex</button>
+        <button type="button" role="radio" data-v="oklch">OKLCH</button>
+      </div>
+    </div>
+    <label class="sr" for="exportCode">Export code</label>
+    <textarea id="exportCode" readonly spellcheck="false"></textarea>
+    <div class="dlg-actions">
+      <button type="button" class="btn ghost" id="downloadExport">Download</button>
+      <button type="button" class="btn primary" id="copyExport">Copy</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

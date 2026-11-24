@@ -88,5 +88,14 @@
     "category": "problem-solving",
     "path": "apps/2026-11-23/",
     "has_screenshot": true
+  },
+  {
+    "day": 11,
+    "date": "2026-11-24",
+    "title": "Huestair",
+    "tagline": "Turn one brand colour into a full OKLCH palette whose steps are evenly spaced by contrast.",
+    "category": "design",
+    "path": "apps/2026-11-24/",
+    "has_screenshot": true
   }
 ]
