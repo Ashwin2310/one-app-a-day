@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brewlapse: a caffeine tracker that knows your last safe coffee</title>
+  <meta name="description" content="Log coffee, tea and energy drinks in one tap. Brewlapse models the caffeine in your body across the day and tells you when you are sleep-safe and the latest time you can have one more.">
+  <meta name="theme-color" content="#15100D">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><i></i></span>
+      <div>
+        <h1>Brewlapse</h1>
+        <p>Caffeine, timed to your sleep</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn ghost" id="exportBtn">Export<span class="wide"> CSV</span></button>
+      <button type="button" class="btn" id="settingsBtn" aria-expanded="false" aria-controls="settings">Settings</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="viewing" id="viewing" hidden>
+      <span id="viewingText"></span>
+      <button type="button" class="link" id="backToday">Back to today</button>
+    </p>
+
+    <section class="stats" aria-label="Summary">
+      <article class="stat">
+        <h2 id="nowLabel">In you now</h2>
+        <p class="big"><span id="nowMg">0</span><small>mg</small></p>
+        <p class="sub" id="nowSub">&nbsp;</p>
+      </article>
+      <article class="stat">
+        <h2>Sleep-safe</h2>
+        <p class="big" id="safeTime">now</p>
+        <p class="sub" id="safeSub">&nbsp;</p>
+      </article>
+      <article class="stat" id="lastCallCard">
+        <h2><label for="lastCallPick">Last call for</label>
+          <select id="lastCallPick"></select>
+        </h2>
+        <p class="big" id="lastCall">--</p>
+        <p class="sub" id="lastCallSub">&nbsp;</p>
+      </article>
+      <article class="stat">
+        <h2 id="totalLabel">Today</h2>
+        <p class="big"><span id="totalMg">0</span><small>/ <span id="limitMg">400</span> mg</small></p>
+        <div class="meter" aria-hidden="true"><span id="meterFill"></span></div>
+        <p class="sub" id="totalSub">&nbsp;</p>
+      </article>
+    </section>
+
+    <section class="card chartcard" aria-labelledby="chartTitle">
+      <div class="cardhead">
+        <h2 id="chartTitle">Caffeine in your body</h2>
+        <p class="readout" id="readout" aria-live="polite">Drag across the chart to scrub</p>
+      </div>
+      <div class="chart" id="chart" tabindex="0" role="img" aria-label="Caffeine level over the day. Use left and right arrow keys to move the cursor."></div>
+      <ul class="legend" aria-hidden="true">
+        <li><i class="lg-curve"></i>Body level</li>
+        <li><i class="lg-ghost"></i>Preview</li>
+        <li><i class="lg-safe"></i>Sleep threshold</li>
+        <li><i class="lg-bed"></i>Bedtime</li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="addTitle">
+      <div class="cardhead">
+        <h2 id="addTitle">Add a drink</h2>
+        <label class="when">When
+          <input type="time" id="whenInput" aria-describedby="whenHint">
+          <button type="button" class="link" id="whenNow">now</button>
+        </label>
+      </div>
+      <p class="hint" id="whenHint">Leave the time empty to log it right now. Hover a drink to preview it.</p>
+      <div class="chips" id="chips"></div>
+      <p class="preview" id="preview" aria-live="polite">&nbsp;</p>
+      <form class="custom" id="customForm" novalidate>
+        <label>Custom drink <input type="text" id="customName" maxlength="24" placeholder="e.g. Matcha latte" autocomplete="off"></label>
+        <label>Caffeine <span class="unit"><input type="number" id="customMg" min="1" max="1000" step="1" placeholder="70" inputmode="numeric"><span>mg</span></span></label>
+        <button type="submit" class="btn">Save drink</button>
+        <p class="err" id="customErr" role="alert"></p>
+      </form>
+    </section>
+
+    <div class="split">
+      <section class="card" aria-labelledby="logTitle">
+        <div class="cardhead">
+          <h2 id="logTitle">Today's log</h2>
+          <span class="count" id="logCount"></span>
+        </div>
+        <ol class="log" id="log"></ol>
+        <p class="empty" id="logEmpty" hidden>No caffeine logged. Pick a drink above.</p>
+      </section>
+
+      <section class="card" aria-labelledby="weekTitle">
+        <div class="cardhead">
+          <h2 id="weekTitle">This week</h2>
+          <span class="count">tap a day</span>
+        </div>
+        <div class="week" id="week"></div>
+        <p class="insight" id="insight"></p>
+      </section>
+    </div>
+
+    <p class="foot">An estimate from a standard pharmacokinetic model, not medical advice. Data stays in this browser.</p>
+  </main>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="settings" aria-labelledby="settingsTitle" hidden>
+    <div class="cardhead">
+      <h2 id="settingsTitle">Settings</h2>
+      <button type="button" class="btn ghost" id="closeSettings">Done</button>
+    </div>
+    <label class="field">Bedtime <input type="time" id="setBed"></label>
+    <label class="field">Caffeine half-life <output id="hlOut">5.0 h</output>
+      <input type="range" id="setHl" min="2" max="10" step="0.5">
+      <span class="scale"><span>fast 2 h</span><span>typical 5 h</span><span>slow 10 h</span></span>
+    </label>
+    <label class="field">Sleep threshold <span class="unit"><input type="number" id="setThr" min="5" max="200" step="5"><span>mg</span></span></label>
+    <label class="field">Daily limit <span class="unit"><input type="number" id="setLim" min="50" max="1000" step="10"><span>mg</span></span></label>
+    <p class="hint">Half-life is often 3 to 7 hours. It is longer during pregnancy or with some medicines, and shorter for smokers.</p>
+    <div class="danger">
+      <button type="button" class="btn ghost" id="sampleBtn">Load sample week</button>
+      <button type="button" class="btn warn" id="resetBtn">Reset all data</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span id="toastText"></span>
+    <button type="button" class="link" id="undoBtn">Undo</button>
+  </div>
+</body>
+</html>

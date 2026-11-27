@@ -97,5 +97,14 @@
     "category": "design",
     "path": "apps/2026-11-24/",
     "has_screenshot": true
+  },
+  {
+    "day": 12,
+    "date": "2026-11-27",
+    "title": "Brewlapse",
+    "tagline": "A caffeine tracker that tells you your last safe coffee before bed.",
+    "category": "utility",
+    "path": "apps/2026-11-27/",
+    "has_screenshot": true
   }
 ]
