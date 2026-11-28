@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hearthsplit · Envy-free rent splitting</title>
+  <meta name="description" content="Split rent across unequal rooms so nobody would rather swap. Hungarian assignment plus envy-free pricing, with the proof on screen.">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">⌂</span>
+      <div>
+        <h1>Hearthsplit</h1>
+        <p class="tagline">Split the rent so nobody would rather swap rooms.</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" id="copyBtn" class="btn btn-primary">Copy agreement</button>
+      <button type="button" id="resetBtn" class="btn btn-ghost">Reset sample</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="results" aria-label="Result">
+      <article class="card plan-card">
+        <div class="card-head">
+          <h2>Who gets which room</h2>
+          <p id="envyBadge" class="badge" role="status" aria-live="polite">Solving…</p>
+        </div>
+        <div class="plan-wrap">
+          <svg id="plan" viewBox="0 0 600 380" role="img" aria-labelledby="planTitle">
+            <title id="planTitle">Floor plan with each room coloured by its assigned housemate and price</title>
+          </svg>
+        </div>
+        <div id="banner" class="banner" hidden></div>
+        <p class="plan-foot" id="planFoot"></p>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Compare splits</h2>
+          <p class="hint">Same rooms, three ways to price them</p>
+        </div>
+        <div class="table-scroll">
+          <table class="compare" id="compareTable"></table>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Envy proof</h2>
+          <p class="hint">How much better off each person is with their own deal than with that room at its price. Every cell at 0 or above means nobody would swap.</p>
+        </div>
+        <div class="table-scroll">
+          <table class="envy" id="envyTable"></table>
+        </div>
+        <p class="cell-note" id="cellNote" aria-live="polite">Hover or focus a cell to read it in plain words.</p>
+      </article>
+
+      <article class="card">
+        <div class="card-head"><h2>Receipts</h2></div>
+        <div class="receipts" id="receipts"></div>
+      </article>
+    </section>
+
+    <section class="setup" aria-label="Setup">
+      <article class="card">
+        <div class="card-head"><h2>Household</h2></div>
+        <div class="field-row">
+          <label class="field">
+            <span>Total monthly rent</span>
+            <input id="rent" type="number" min="0" step="1" inputmode="numeric">
+          </label>
+          <label class="field field-small">
+            <span>Currency</span>
+            <input id="currency" type="text" maxlength="3" autocomplete="off">
+          </label>
+        </div>
+        <p class="hint">Each row adds one housemate and one room. The bids decide who gets which room.</p>
+        <div class="house-head" aria-hidden="true">
+          <span>Housemate</span><span>Room</span><span>m²</span><span></span>
+        </div>
+        <div id="houseList" class="house-list"></div>
+        <button type="button" id="addBtn" class="btn btn-soft">+ Add housemate &amp; room</button>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Bids</h2>
+          <button type="button" id="fitAllBtn" class="btn btn-soft btn-sm">Fit all rows</button>
+        </div>
+        <p class="hint">Each person splits the whole rent across the rooms by what each room is worth to them. Every row should add up to the rent.</p>
+        <div class="table-scroll">
+          <table class="bids" id="bidsTable"></table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <section class="how" aria-labelledby="howTitle">
+    <h2 id="howTitle">How it works</h2>
+    <ol>
+      <li><strong>Bid.</strong> Everyone divides the full rent across the rooms by how much they want each one.</li>
+      <li><strong>Assign.</strong> The Hungarian algorithm gives each room to someone so the total of winning bids is as high as possible.</li>
+      <li><strong>Price.</strong> "Nobody envies anyone" becomes a set of difference constraints, which Bellman-Ford shortest paths solve.</li>
+      <li><strong>Balance.</strong> Every price drops by the same amount until they add up to the rent, which gives the least happy person as much surplus as possible.</li>
+    </ol>
+  </section>
+
+  <footer class="foot">Runs entirely in your browser. Nothing is uploaded and your household is saved only on this device.</footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

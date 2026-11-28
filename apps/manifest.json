@@ -106,5 +106,14 @@
     "category": "utility",
     "path": "apps/2026-11-27/",
     "has_screenshot": true
+  },
+  {
+    "day": 13,
+    "date": "2026-11-28",
+    "title": "Hearthsplit",
+    "tagline": "Split rent across unequal rooms so nobody would rather swap, with the proof on screen.",
+    "category": "problem-solving",
+    "path": "apps/2026-11-28/",
+    "has_screenshot": true
   }
 ]
